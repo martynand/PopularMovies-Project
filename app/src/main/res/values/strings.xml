@@ -1,0 +1,42 @@
+<resources>
+
+    // Activities titles
+    <string name="app_name">Popular Movies</string>
+    <string name="moviedetail_label">Movie details</string>
+    <string name="settings_label">Settings</string>
+
+    // Menu values
+    <string name="action_settings" translatable="false">Settings</string>
+
+    // Sorting preferece values
+    <string name="pref_sort_label" translatable="false">Sort by...</string>
+    <string name="pref_sort_key" translatable="false">sorting</string>
+    <string name="default_sort" translatable="false">popular</string>
+
+    //strings for array with entryvalues
+    <string name="pref_popularity" translatable="false">popular</string>
+    <string name="pref_rating" translatable="false">top_rated</string>
+
+    //strings for array with entrynames
+    <string name="pref_popularity_label">Popularity</string>
+    <string name="pref_rating_label">Rating</string>
+
+    <string-array
+        name="pref_array_values">
+        <item>@string/pref_popularity</item>
+        <item>@string/pref_rating</item>
+    </string-array>
+
+    <string-array
+        name="pref_array_names">
+        <item>@string/pref_popularity_label</item>
+        <item>@string/pref_rating_label</item>
+    </string-array>
+
+    // Text for detail activity
+    <string name="movie_detail_title">Title:</string>
+    <string name="movie_detail_date">Date:</string>
+    <string name="movie_detail_rating">Rating:</string>
+    <string name="movie_detail_plot">Plot:</string>
+
+</resources>
