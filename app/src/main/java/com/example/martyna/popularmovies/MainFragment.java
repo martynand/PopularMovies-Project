@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,9 +24,9 @@ public class MainFragment extends Fragment {
 
     public GridView movieGrid;
     private ArrayList<MovieClass> movieList;
-    private String sortingOption;
-    private String currentSortingOption;
-    SharedPreferences prefs;
+    private String sortOption;
+    private String currentSortOption;
+    private SharedPreferences prefs;
 
     public MainFragment() {
     }
@@ -36,20 +35,26 @@ public class MainFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        sortingOption = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.default_sort));
-        Log.v(PREFS_TAG," old: " +  sortingOption);
-        if (savedInstanceState == null || !savedInstanceState.containsKey("movies")) {
+        if (savedInstanceState == null || !savedInstanceState.containsKey("movies") || !savedInstanceState.containsKey(String.valueOf(R.string.pref_sort_key))) {
+
             movieList = new ArrayList<>(Arrays.<MovieClass>asList());
+
+            prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            sortOption = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.default_sort));
+
         } else {
+
             movieList = savedInstanceState.getParcelableArrayList("movies");
+            savedInstanceState.getString(String.valueOf(R.string.pref_sort_key));
         }
     }
 
+
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList("movies", movieList);
-        super.onSaveInstanceState(outState);
+    public void onSaveInstanceState(Bundle outState){
+            super.onSaveInstanceState(outState);
+            outState.putParcelableArrayList("movies", movieList);
+            outState.putString(String.valueOf(R.string.pref_sort_key), sortOption);
     }
 
     @Override
@@ -74,26 +79,24 @@ public class MainFragment extends Fragment {
         return view;
     }
 
-    private void getData() {
-
-        currentSortingOption = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.default_sort));
-        Log.v(PREFS_TAG," new: " + currentSortingOption);
-
-        if (currentSortingOption.equals(sortingOption)) {
-            FetchMovieDataTask downloadTask = new FetchMovieDataTask();
-            downloadTask.execute(currentSortingOption);
-        }
-    }
-
     @Override
-    public void onStart() {
+    public void onStart(){
         super.onStart();
 
         if (ConnectionCheck.isNetworkAvailable(getContext())) {
-            getData();
+                getData();
         } else {
             Toast.makeText(getContext(), "No network! Check your connection.", Toast.LENGTH_LONG).show();
         }
+    }
 
+    private void getData() {
+
+        currentSortOption = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.default_sort));
+
+        if (!sortOption.equals(currentSortOption)) {
+            FetchMovieDataTask downloadTask = new FetchMovieDataTask();
+            downloadTask.execute(currentSortOption);
+        }
     }
 }
