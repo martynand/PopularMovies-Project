@@ -20,7 +20,7 @@ android {
     }
 
     buildTypes.each {
-        it.buildConfigField 'String', 'OPEN_MOVIES_API_KEY', MyApiKey
+        it.buildConfigField 'String', 'OPEN_MOVIES_API_KEY', API KEY HERE
     }
 
 

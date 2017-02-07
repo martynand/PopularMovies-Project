@@ -62,7 +62,5 @@
             android:padding="@dimen/general_padding"
             tools:text="@string/movie_detail_plot"/>
 
-
-
     </RelativeLayout>
 </ScrollView>

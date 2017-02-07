@@ -1,9 +1,7 @@
 package com.example.martyna.popularmovies;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -15,48 +13,35 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MainFragment extends Fragment {
 
+    private static final String MOVIES_KEY = "movies_key";
+    private static final String SORT_OPTION_KEY = "sort_option";
+
+    private ArrayList<MovieClass> movieList;
+    private String sortOption;
     public static PosterArrayAdapter adapter;
 
-    private final String PREFS_TAG = SettingsActivity.class.getSimpleName();
-
-    public GridView movieGrid;
-    private ArrayList<MovieClass> movieList;
-    private String sortingOption;
-    private String currentSortingOption;
-    SharedPreferences prefs;
-
     public MainFragment() {
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        sortingOption = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.default_sort));
-        Log.v(PREFS_TAG," old: " +  sortingOption);
-        if (savedInstanceState == null || !savedInstanceState.containsKey("movies")) {
-            movieList = new ArrayList<>(Arrays.<MovieClass>asList());
-        } else {
-            movieList = savedInstanceState.getParcelableArrayList("movies");
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList("movies", movieList);
-        super.onSaveInstanceState(outState);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
-        movieGrid = (GridView) view.findViewById(R.id.movies_grid);
+        GridView movieGrid = (GridView) view.findViewById(R.id.movies_grid);
+
+        if (savedInstanceState == null || !savedInstanceState.containsKey(MOVIES_KEY) || !savedInstanceState.containsKey(SORT_OPTION_KEY)) {
+            movieList = new ArrayList<>();
+            sortOption = SortOptionClass.getPreferenceSortOrder(getContext());
+
+        } else {
+
+            movieList = savedInstanceState.getParcelableArrayList(MOVIES_KEY);
+            sortOption = savedInstanceState.getString(SORT_OPTION_KEY);
+        }
+
         adapter = new PosterArrayAdapter(getActivity(), movieList);
         movieGrid.setAdapter(adapter);
 
@@ -74,26 +59,34 @@ public class MainFragment extends Fragment {
         return view;
     }
 
-    private void getData() {
-
-        currentSortingOption = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.default_sort));
-        Log.v(PREFS_TAG," new: " + currentSortingOption);
-
-        if (currentSortingOption.equals(sortingOption)) {
-            FetchMovieDataTask downloadTask = new FetchMovieDataTask();
-            downloadTask.execute(currentSortingOption);
-        }
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(MOVIES_KEY, movieList);
+        outState.putString(SORT_OPTION_KEY, sortOption);
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
 
-        if (ConnectionCheck.isNetworkAvailable(getContext())) {
+        String newSortOrder = SortOptionClass.getPreferenceSortOrder(getContext());
+
+        if (movieList.isEmpty() || (newSortOrder != null && !newSortOrder.equals(sortOption))) {
+            sortOption = newSortOrder;
             getData();
+        }
+    }
+
+    public void getData() {
+
+        if (ConnectionCheck.isNetworkAvailable(getActivity())) {
+
+            FetchMovieDataTask downloadTask = new FetchMovieDataTask();
+            downloadTask.execute(sortOption);
+
         } else {
             Toast.makeText(getContext(), "No network! Check your connection.", Toast.LENGTH_LONG).show();
         }
-
     }
 }

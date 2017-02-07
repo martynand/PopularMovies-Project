@@ -7,14 +7,14 @@ import android.net.NetworkInfo;
 
 public class ConnectionCheck {
 
-        public static Boolean isNetworkAvailable(Context context){
+    public static Boolean isNetworkAvailable(Context context) {
 
-            Boolean value = false;
-            ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = manager.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected()){
-                value = true;
-            }
-            return value;
+        Boolean value = false;
+        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            value = true;
         }
+        return value;
     }
+}
